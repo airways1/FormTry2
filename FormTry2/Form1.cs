@@ -18,7 +18,8 @@ namespace FormTry2
             TransparencyKey = BackColor;
             //this.BackColor = Color.White;
             panel1.BackColor = Color.Transparent;// Color.FromArgb(25, Color.Black);
-            //recSize = new Size();
+            //oldRect = new Size();
+            DoubleBuffered = true;
             
         }
 
@@ -39,7 +40,7 @@ namespace FormTry2
         private Rectangle bottomLeftZone;
         private Rectangle topLeftZone;
         private Rectangle centerZone;
-        private Size recSize;
+        private Rectangle oldRect;
         // for use when making the Form movable
         private int mdx, mdy, dx, dy;
 
@@ -56,8 +57,8 @@ namespace FormTry2
             {
                 Graphics g = panel1.CreateGraphics();
 
-                if (recSize.Width ==0 && recSize.Height==0)
-                    recSize = panel1.ClientSize;
+              //  if (oldRect.Width ==0 && oldRect.Height==0)
+              //      oldRect = panel1.ClientSize;
                 g.DrawRectangle(p, new Rectangle(halfThickness,
                                                           halfThickness,
                                                           panel1.ClientSize.Width - thickness,
@@ -243,8 +244,9 @@ namespace FormTry2
             {
                 mdx = e.X;
                 mdy = e.Y;
-                //ppnt = panel1.PointToClient(new Point(e.X, e.Y));
-                ppnt = new Point(e.X, e.Y);
+                oldRect = panel1.ClientRectangle;
+                ppnt = panel1.PointToScreen(new Point(e.X, e.Y));
+                //ppnt = new Point(e.X, e.Y);
                 kind = 1;
                 panel1.MouseMove += Panel1_MouseMove;
                 
@@ -254,6 +256,9 @@ namespace FormTry2
             {
                 mdx = e.X;
                 mdy = e.Y;
+                oldRect = panel1.ClientRectangle;
+                ppnt = panel1.PointToScreen(new Point(e.X, e.Y));
+
                 kind = 2;
                 panel1.MouseMove += Panel1_MouseMove;
 
@@ -264,6 +269,9 @@ namespace FormTry2
             {
                 mdx = e.X;
                 mdy = e.Y;
+                oldRect = panel1.ClientRectangle;
+                ppnt = panel1.PointToScreen(new Point(e.X, e.Y));
+
                 kind = 3;
                 panel1.MouseMove += Panel1_MouseMove;
 
@@ -274,6 +282,9 @@ namespace FormTry2
             {
                 mdx = e.X;
                 mdy = e.Y;
+                oldRect = panel1.ClientRectangle;
+                ppnt = panel1.PointToScreen(new Point(e.X, e.Y));
+
                 kind = 4;
                 panel1.MouseMove += Panel1_MouseMove;
 
@@ -284,6 +295,12 @@ namespace FormTry2
             {
                 mdx = e.X;
                 mdy = e.Y;
+                oldRect = panel1.ClientRectangle;
+                oldRect.Y = panel1.Top;
+                oldRect.X = panel1.Left;
+
+                ppnt = panel1.PointToScreen(new Point(e.X, e.Y));
+
                 kind = 5;
                 panel1.MouseMove += Panel1_MouseMove;
 
@@ -305,8 +322,8 @@ namespace FormTry2
         //不能放在form的事件mouseMove中
         {
             if (kind == 0) return;
-            //Point cpnt = panel1.PointToClient(new Point(e.X, e.Y));
-            Point cpnt =  new Point(e.X, e.Y);
+            Point cpnt = panel1.PointToScreen(new Point(e.X, e.Y));
+            //Point cpnt =  new Point(e.X, e.Y);
             //dx =  e.X - mdx;//mdx,mdy是上次mouse down的滑鼠座標點
             //dy =  e.Y - mdy;
             dx = cpnt.X - ppnt.X;
@@ -318,34 +335,42 @@ namespace FormTry2
                 case 1:
                     panel1.Top = cpnt.Y;
                     panel1.Left = cpnt.X;
-                    //panel1.Width -= dx;
-                    //panel1.Height -= dy;
+                    panel1.Width = oldRect.Width- dx;
+                    panel1.Height = oldRect.Height - dy;
                     //Console.WriteLine("("+this.Top+"," +this.Left+")("+this.Width+","+this.Height+")("+dx+","+dy+")");
                     Console.WriteLine("-(" + ppnt.X + "," + ppnt.Y + ")(" + cpnt.X + "," + cpnt.Y + ")(" + dx + "," + dy + ")");
 
                     break;
                 case 2://右上
-                    this.Top = pnt.Y;
-                    this.Width = pnt.X;
+                    panel1.Top = ppnt.Y+dy;
+                    //this.Width = pnt.X;
+                    panel1.Width = oldRect.Width + dx;
+                    panel1.Height = oldRect.Height - dy;
+
                     break;
                 case 3: //左下
-                    this.Left = pnt.X;
-                    this.Height = pnt.Y;
+                    panel1.Left = pnt.X;
+                    panel1.Width = oldRect.Width - dx;
+                    panel1.Height = oldRect.Height + dy;
                     break;
 
                 case 4:
-                    this.Width = pnt.X; //視窗的寬度設為panel的寬度
-                    this.Height = pnt.Y;
+                    //panel1.Width = pnt.X; //視窗的寬度設為panel的寬度
+                    //panel1.Height = pnt.Y;
+                    panel1.Width = oldRect.Width + dx;
+                    panel1.Height = oldRect.Height + dy;
 
                     break;
 
                 case 5:
-                    this.Top += dy;
-                    this.Left += dx;
+                    //Point tl = panel1.PointToScreen(new Point(oldRect.X, oldRect.Y));
+                    panel1.Top = oldRect.Y+dy;
+                    panel1.Left = oldRect.X+dx;
                     break;
 
             }
-            updateme();
+            //updateme();
+            this.Invalidate(); //只用上面會留下殘影
             
         }
     }
