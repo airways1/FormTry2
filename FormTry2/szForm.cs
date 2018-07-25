@@ -29,6 +29,7 @@ namespace FormTry2
         private void Form1_Load(object sender, EventArgs e)
         {
             // now in branch v2
+            // new comment in v2
         }
         
         const int DragAreaSize = 16;
