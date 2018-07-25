@@ -10,9 +10,9 @@ using System.Windows.Forms;
 
 namespace FormTry2
 {
-    public partial class Form1 : Form
+    public partial class szForm : Form
     {
-        public Form1()
+        public szForm()
         {
             InitializeComponent();
             TransparencyKey = BackColor;
